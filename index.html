@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🇰🇷 Korean Quiz Time!</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#FFFDF7;--cream:#FFF8EC;--border:#E8E0D0;
+  --txt:#2D2D2D;--muted:#9A9A9A;
+  --red:#FF4757;--green:#2ED573;--purple:#A855F7;
+  --rad:16px;
+}
+body{
+  background:var(--white);color:var(--txt);
+  font-family:'Nunito',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;padding:0 16px 80px;
+  position:relative;overflow-x:hidden;
+}
+
+/* BG bubbles */
+.bubble{position:fixed;border-radius:50%;pointer-events:none;z-index:0;opacity:.12}
+.b1{width:300px;height:300px;background:#A855F7;top:-80px;right:-80px}
+.b2{width:250px;height:250px;background:#FF6B9D;bottom:-60px;left:-60px}
+.b3{width:180px;height:180px;background:#FFC107;top:40%;right:-50px}
+
+.wrap{width:100%;max-width:680px;position:relative;z-index:1}
+
+/* ── HEADER ── */
+.app-title{
+  text-align:center;padding:36px 0 24px;
+}
+.app-title h1{
+  font-size:clamp(26px,6vw,42px);font-weight:900;
+  background:linear-gradient(135deg,#FF6B9D,#A855F7,#4ECDC4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1.2;margin-bottom:6px;
+}
+.app-title p{font-size:14px;color:var(--muted);font-weight:600}
+
+/* ── CARDS ── */
+.card{
+  background:#fff;border:2px solid var(--border);border-radius:20px;
+  padding:24px;margin-bottom:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+
+/* ── SECTION LABEL ── */
+.slbl{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:10px}
+
+/* ── INPUT ── */
+.key-wrap{position:relative}
+.key-wrap input{padding-right:44px}
+input[type=password],input[type=text]{
+  width:100%;background:#F9F6FF;border:2px solid #E0D5F5;border-radius:12px;
+  color:var(--txt);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  padding:12px 16px;outline:none;transition:all .2s;
+}
+input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+input::placeholder{color:var(--muted);font-weight:500}
+.key-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{
+  flex:1;background:#F5F3FF;border:2px solid transparent;border-radius:12px;
+  color:var(--muted);cursor:pointer;font-family:'Nunito',sans-serif;
+  font-size:12px;font-weight:800;letter-spacing:.5px;
+  padding:10px 8px;text-transform:uppercase;transition:all .2s;text-align:center;
+}
+.tab:hover{border-color:#C4B5FD;color:var(--purple)}
+.tab.on{background:linear-gradient(135deg,#A855F7,#7C3AED);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(168,85,247,.3)}
+
+/* ── TEXTAREA ── */
+textarea{
+  width:100%;min-height:160px;background:#F9F6FF;border:2px solid #E0D5F5;
+  border-radius:12px;color:var(--txt);font-family:'Nunito',sans-serif;
+  font-size:14px;font-weight:600;line-height:1.7;outline:none;
+  padding:14px 16px;resize:vertical;transition:all .2s;
+}
+textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+textarea::placeholder{color:var(--muted);font-weight:500}
+
+/* ── DROPZONE ── */
+.drop{
+  border:3px dashed #C4B5FD;border-radius:16px;cursor:pointer;min-height:120px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:20px;transition:all .2s;text-align:center;background:#F9F6FF;
+}
+.drop:hover,.drop.drag{border-color:var(--purple);background:#F0EAFF}
+.drop-icon{font-size:36px}
+.drop-txt{font-size:13px;color:var(--muted);font-weight:700}
+#file-inp{display:none}
+.fnm{font-size:12px;color:var(--purple);margin-top:8px;font-weight:700;min-height:16px}
+
+/* ── BUTTONS ── */
+.btn{
+  border:none;border-radius:14px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;
+  letter-spacing:.5px;padding:14px 24px;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-main{
+  background:linear-gradient(135deg,#FF6B9D,#A855F7);
+  color:#fff;width:100%;margin-top:14px;font-size:16px;
+  box-shadow:0 6px 20px rgba(168,85,247,.3);
+}
+.btn-main:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(168,85,247,.4)}
+.btn-main:active{transform:translateY(0)}
+.btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-next{
+  background:linear-gradient(135deg,#4ECDC4,#44A08D);
+  color:#fff;padding:12px 28px;font-size:14px;
+  box-shadow:0 4px 14px rgba(78,205,196,.3);
+}
+.btn-next:hover{transform:translateY(-2px)}
+.btn-ghost{
+  background:#F5F3FF;border:2px solid #E0D5F5;color:var(--muted);
+  padding:10px 18px;font-size:12px;
+}
+.btn-ghost:hover{border-color:var(--purple);color:var(--purple)}
+
+/* ── STATUS ── */
+#status{
+  font-size:13px;font-weight:700;color:var(--muted);
+  text-align:center;margin:12px 0;min-height:20px;line-height:1.6;
+}
+#status.err{color:var(--red)}
+.spin{
+  display:inline-block;font-size:18px;
+  animation:spinE .8s linear infinite;vertical-align:middle;margin-right:6px;
+}
+@keyframes spinE{to{transform:rotate(360deg)}}
+
+/* ── WORD CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;max-height:130px;overflow-y:auto}
+.chip{
+  border-radius:20px;font-family:'Noto Serif KR',serif;font-size:13px;
+  padding:4px 12px;font-weight:700;transition:all .3s;
+  background:#F0EAFF;color:var(--purple);border:2px solid #C4B5FD;
+}
+.chip.done{opacity:.3;text-decoration:line-through;background:#F5F5F5;border-color:#E0E0E0;color:#aaa}
+.chip.cur{background:linear-gradient(135deg,#FF6B9D,#A855F7);color:#fff;border-color:transparent;
+  box-shadow:0 4px 12px rgba(168,85,247,.3);transform:scale(1.05)}
+
+/* ── PROGRESS ── */
+.prog-wrap{
+  height:10px;background:#F0EAFF;border-radius:10px;
+  margin-bottom:24px;overflow:hidden;border:2px solid #E0D5F5;
+}
+.prog-fill{
+  height:100%;border-radius:10px;transition:width .5s ease;
+  background:linear-gradient(90deg,#FF6B9D,#A855F7,#4ECDC4,#FFC107);
+  background-size:200% 100%;animation:rainbowBar 2s linear infinite;
+}
+@keyframes rainbowBar{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* ── QUIZ META ── */
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+.q-ctr{
+  background:#F0EAFF;border-radius:20px;padding:6px 14px;
+  font-size:12px;font-weight:800;color:var(--purple);
+}
+.q-stars{font-size:16px;letter-spacing:2px}
+
+/* ── WORD CARD ── */
+.word-card{
+  border-radius:20px;padding:28px 20px;text-align:center;margin-bottom:20px;
+  position:relative;overflow:hidden;
+  animation:popIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.word-card::before{
+  content:'';position:absolute;top:-30%;right:-20%;
+  width:160px;height:160px;border-radius:50%;
+  background:rgba(255,255,255,.15);pointer-events:none;
+}
+.ko-big{
+  font-family:'Noto Serif KR',serif;
+  font-size:clamp(44px,11vw,72px);font-weight:700;
+  color:#fff;line-height:1.1;
+  text-shadow:0 2px 12px rgba(0,0,0,.15);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.q-hint{color:rgba(255,255,255,.85);font-size:13px;font-weight:700;margin-top:10px}
+
+/* Card color themes per question */
+.gc0{background:linear-gradient(135deg,#FF6B9D,#FF8E53)}
+.gc1{background:linear-gradient(135deg,#A855F7,#6366F1)}
+.gc2{background:linear-gradient(135deg,#4ECDC4,#44A08D)}
+.gc3{background:linear-gradient(135deg,#FFC107,#FF9800)}
+.gc4{background:linear-gradient(135deg,#FF4757,#C0392B)}
+.gc5{background:linear-gradient(135deg,#2196F3,#0D47A1)}
+.gc6{background:linear-gradient(135deg,#00BCD4,#006064)}
+.gc7{background:linear-gradient(135deg,#8BC34A,#33691E)}
+
+/* ── OPTIONS ── */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:460px){.opts{grid-template-columns:1fr}}
+
+/* Pastel option colors */
+.opt{
+  border-radius:14px;color:var(--txt);cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;
+  line-height:1.4;padding:13px 14px;text-align:left;
+  display:flex;align-items:center;gap:10px;
+  transition:all .18s;width:100%;border:2px solid transparent;
+}
+.opt:hover:not(:disabled){transform:translateX(4px) translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.1)}
+.opt:disabled{cursor:default}
+.opt-l{
+  font-size:11px;font-weight:900;width:22px;height:22px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;background:rgba(255,255,255,.6);color:inherit;
+}
+
+/* Option pastel colors */
+.oc0{background:#FFF0F6;border-color:#FFB3D1} .oc0:hover:not(:disabled){border-color:#FF6B9D}
+.oc1{background:#F3E8FF;border-color:#C4B5FD} .oc1:hover:not(:disabled){border-color:#A855F7}
+.oc2{background:#E0F7FA;border-color:#80DEEA} .oc2:hover:not(:disabled){border-color:#4ECDC4}
+.oc3{background:#FFF8E1;border-color:#FFE082} .oc3:hover:not(:disabled){border-color:#FFC107}
+.oc4{background:#F3F4F6;border-color:#D1D5DB} .oc4:hover:not(:disabled){border-color:#9CA3AF}
+.oc5{background:#E8F5E9;border-color:#A5D6A7} .oc5:hover:not(:disabled){border-color:#4CAF50}
+.oc6{background:#FFF3E0;border-color:#FFCC80} .oc6:hover:not(:disabled){border-color:#FF9800}
+.oc7{background:#E3F2FD;border-color:#90CAF9} .oc7:hover:not(:disabled){border-color:#2196F3}
+
+.opt.ok{
+  background:#D1FAE5!important;border-color:#10B981!important;color:#065F46!important;
+  animation:confettiBurst .4s ease;
+}
+@keyframes confettiBurst{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.08);box-shadow:0 0 0 6px rgba(16,185,129,.2)}
+  100%{transform:scale(1)}
+}
+.opt.bad{
+  background:#FEE2E2!important;border-color:#EF4444!important;color:#991B1B!important;
+  animation:shake .4s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}
+.opt.dim{opacity:.4}
+
+/* ── FEEDBACK ── */
+.fb{
+  margin-top:14px;padding:14px 16px;border-radius:14px;
+  font-size:14px;font-weight:700;line-height:1.5;
+  display:none;animation:popIn .3s ease;text-align:center;
+}
+.fb.ok{background:#D1FAE5;color:#065F46;border:2px solid #A7F3D0}
+.fb.bad{background:#FEE2E2;color:#991B1B;border:2px solid #FECACA}
+.next-row{display:flex;justify-content:flex-end;margin-top:12px}
+
+/* ── LOADING ── */
+.loading-msgs{
+  text-align:center;padding:40px 0;
+}
+.loading-emoji{font-size:52px;animation:spinE .8s linear infinite;display:block;margin-bottom:16px}
+.loading-txt{font-size:16px;font-weight:800;color:var(--purple);margin-bottom:8px}
+.loading-sub{font-size:13px;color:var(--muted);font-weight:600}
+
+/* ── RESULTS ── */
+.res-hero{text-align:center;padding:36px 24px 24px}
+.res-big-emoji{font-size:72px;display:block;margin-bottom:10px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+.res-pct{
+  font-size:clamp(60px,16vw,96px);font-weight:900;line-height:1;margin-bottom:4px;
+  background:linear-gradient(135deg,#FF6B9D,#A855F7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.res-msg{font-size:18px;font-weight:800;color:var(--txt);margin-bottom:24px}
+.stat-boxes{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.stat-box{
+  border-radius:16px;padding:14px 20px;text-align:center;min-width:80px;
+}
+.stat-box.g{background:#D1FAE5;color:#065F46}
+.stat-box.r{background:#FEE2E2;color:#991B1B}
+.stat-box.b{background:#E0E7FF;color:#3730A3}
+.stat-n{font-size:28px;font-weight:900}
+.stat-l{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* ── REVIEW TABLE ── */
+.rev-wrap{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;color:var(--muted);font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;border-bottom:2px solid var(--border);font-weight:800}
+td{padding:10px 10px;border-bottom:1px solid #F0EDE8;vertical-align:middle;font-weight:600}
+td:first-child{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:700}
+.badge{display:inline-block;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:800}
+.badge.ok{background:#D1FAE5;color:#065F46}
+.badge.bad{background:#FEE2E2;color:#991B1B}
+tr:hover td{background:#FAFAFA}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#F9F6FF}
+::-webkit-scrollbar-thumb{background:#C4B5FD;border-radius:3px}
+.hidden{display:none!important}
+.mt12{margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="app-title">
+    <h1>🇰🇷 Korean Quiz Time! 🎉</h1>
+    <p>Test your Korean → Hindi vocab knowledge!</p>
+  </div>
+
+  <!-- API KEY -->
+  <div id="api-sec" class="card">
+    <div class="slbl">🔑 OpenAI API Key</div>
+    <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:12px;line-height:1.6">
+      Get a free key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--purple);font-weight:800">platform.openai.com/api-keys</a><br>
+      Your key stays in your browser only — never sent anywhere else.
+    </div>
+    <div class="key-wrap">
+      <input type="password" id="api-key" placeholder="sk-proj-..." autocomplete="off"/>
+      <span class="key-icon">🔑</span>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div id="inp-sec" class="card">
+    <div class="slbl">📝 Your Text</div>
+    <div class="tabs">
+      <button class="tab on" onclick="swTab('type',this)">✍️ Type / Paste</button>
+      <button class="tab" onclick="swTab('upload',this)">📂 Upload File</button>
+    </div>
+    <div id="pane-type">
+      <textarea id="txt" placeholder="Paste any text here — Korean, mixed languages, subtitles, stories… 🌟"></textarea>
+    </div>
+    <div id="pane-upload" class="hidden">
+      <div class="drop" id="dz" onclick="document.getElementById('file-inp').click()">
+        <div class="drop-icon">📂</div>
+        <div class="drop-txt">Click or drag &amp; drop your file here!<br><small style="opacity:.7">.txt .md .srt — any size ✨</small></div>
+        <input type="file" id="file-inp" accept=".txt,.md,.srt,.csv"/>
+      </div>
+      <div class="fnm" id="fnm"></div>
+    </div>
+    <div id="status"></div>
+    <button class="btn btn-main" id="go-btn" onclick="startQuiz()">
+      🔍 Find Korean Words &amp; Start Quiz!
+    </button>
+  </div>
+
+  <!-- WORD LIST -->
+  <div id="wl-sec" class="card hidden">
+    <div class="slbl">✨ Korean Words Found</div>
+    <div class="chips" id="chips"></div>
+    <div class="mt12"><button class="btn btn-ghost" onclick="resetAll()">← Start Over</button></div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="load-sec" class="card hidden">
+    <div class="loading-msgs">
+      <span class="loading-emoji" id="load-emoji">🌀</span>
+      <div class="loading-txt" id="load-txt">Hunting for Korean words…</div>
+      <div class="loading-sub" id="load-sub">This will just take a moment!</div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-sec" class="hidden">
+    <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+
+    <!-- Word chips progress -->
+    <div class="card" style="padding:16px 20px;margin-bottom:14px">
+      <div class="chips" id="q-chips"></div>
+    </div>
+
+    <div class="card" style="padding:20px">
+      <div class="q-meta">
+        <div class="q-ctr" id="q-ctr">🎯 Question 1 of ?</div>
+        <div class="q-stars" id="q-stars"></div>
+      </div>
+
+      <!-- Korean word card -->
+      <div class="word-card gc0" id="word-card">
+        <div class="ko-big" id="q-wd">사랑</div>
+        <div class="q-hint">👇 What does this mean in Hindi?</div>
+      </div>
+
+      <div class="opts" id="opts"></div>
+      <div class="fb" id="fb"></div>
+      <div class="next-row" id="nxt-row" style="display:none">
+        <button class="btn btn-next" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="res-sec" class="hidden">
+    <div class="card">
+      <div class="res-hero">
+        <span class="res-big-emoji" id="r-emo">🎉</span>
+        <div class="res-pct" id="r-pct">0%</div>
+        <div class="res-msg" id="r-msg">Quiz Complete!</div>
+        <div class="stat-boxes">
+          <div class="stat-box g"><div class="stat-n" id="r-ok">0</div><div class="stat-l">✅ Correct</div></div>
+          <div class="stat-box r"><div class="stat-n" id="r-bad">0</div><div class="stat-l">❌ Wrong</div></div>
+          <div class="stat-box b"><div class="stat-n" id="r-tot">0</div><div class="stat-l">🎯 Total</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="slbl">📋 Review Your Answers</div>
+      <div class="rev-wrap">
+        <table>
+          <thead><tr><th>Word</th><th>Correct</th><th>Your Answer</th><th>Result</th></tr></thead>
+          <tbody id="rev-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <button class="btn btn-main" onclick="resetAll()">🔄 Play Again!</button>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+const LETTERS = ['A','B','C','D','E','F','G','H'];
+const CARD_COLORS = ['gc0','gc1','gc2','gc3','gc4','gc5','gc6','gc7'];
+const LOAD_MSGS = [
+  ['🔍','Hunting for Korean words…','Scanning your text!'],
+  ['🧠','Thinking hard…','Almost there!'],
+  ['✨','Cooking up questions…','Making it tricky!'],
+  ['🎨','Adding some magic…','Nearly ready!'],
+  ['🚀','Almost ready!','Just a few more seconds…'],
+];
+
+let S = { qs:[], cur:0, score:0, answers:[], words:[], loading:false };
+let loadMsgIdx = 0, loadInterval = null;
+
+// ── TABS ──
+function swTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('pane-type').classList.toggle('hidden', tab !== 'type');
+  document.getElementById('pane-upload').classList.toggle('hidden', tab !== 'upload');
+}
+
+// ── FILE UPLOAD ──
+const dz = document.getElementById('dz');
+const fi = document.getElementById('file-inp');
+fi.onchange = () => fi.files[0] && readFile(fi.files[0]);
+dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag'); };
+dz.ondragleave = () => dz.classList.remove('drag');
+dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag'); e.dataTransfer.files[0] && readFile(e.dataTransfer.files[0]); };
+function readFile(f) {
+  const r = new FileReader();
+  r.onload = e => {
+    document.getElementById('txt').value = e.target.result;
+    document.getElementById('fnm').textContent = '✓ ' + f.name + ' loaded!';
+    document.querySelectorAll('.tab')[0].click();
+  };
+  r.readAsText(f);
+}
+
+// ── STATUS ──
+function setSt(msg, type) {
+  const el = document.getElementById('status');
+  el.innerHTML = type === 'load' ? '<span class="spin">🌀</span> ' + msg : msg;
+  el.className = type === 'err' ? 'err' : '';
+}
+
+// ── LOADING SCREEN ANIMATION ──
+function startLoadAnim() {
+  loadMsgIdx = 0;
+  updateLoadMsg();
+  loadInterval = setInterval(() => {
+    loadMsgIdx = (loadMsgIdx + 1) % LOAD_MSGS.length;
+    updateLoadMsg();
+  }, 2200);
+}
+function stopLoadAnim() { clearInterval(loadInterval); }
+function updateLoadMsg() {
+  const m = LOAD_MSGS[loadMsgIdx];
+  document.getElementById('load-emoji').textContent = m[0];
+  document.getElementById('load-txt').textContent = m[1];
+  document.getElementById('load-sub').textContent = m[2];
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── CALL OPENAI ──
+async function callOpenAI(messages, retries = 3) {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) throw new Error('Please enter your OpenAI API key 🔑');
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + key,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages,
+          max_tokens: 4000,
+          temperature: 0.7
+        })
+      });
+
+      if (res.status === 429) {
+        const wait = 6000 * (attempt + 1);
+        document.getElementById('load-txt').textContent = `Rate limit — retrying in ${wait/1000}s…`;
+        await sleep(wait);
+        continue;
+      }
+
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.error?.message || 'API error ' + res.status);
+      }
+
+      const data = await res.json();
+      return (data.choices?.[0]?.message?.content || '').trim();
+
+    } catch (err) {
+      if (attempt < retries && !err.message.includes('API key')) {
+        await sleep(3000 * (attempt + 1));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error('Failed after retries. Please try again! 😅');
+}
+
+// ── EXTRACT KOREAN ──
+async function extractKorean(text) {
+  const raw = await callOpenAI([
+    { role: 'system', content: 'You are a Korean language expert. Output only valid JSON arrays, nothing else. No markdown.' },
+    { role: 'user', content: `Extract all unique Korean words (Hangul only) from this text.\nReturn ONLY a JSON array. Example: ["사랑","단어","한국"]\n\nText:\n"""\n${text.slice(0, 12000)}\n"""` }
+  ]);
+  const clean = raw.replace(/```json|```/g, '').trim();
+  const m = clean.match(/\[[\s\S]*\]/);
+  if (!m) throw new Error('Could not find Korean words 😅 Try a different text!');
+  const words = JSON.parse(m[0]);
+  if (!Array.isArray(words) || words.length === 0) throw new Error('No Korean words found in your text! 🤔');
+  return [...new Set(words.filter(w => /[\uAC00-\uD7A3]/.test(w)))];
+}
+
+// ── GENERATE BATCH ──
+async function generateBatch(words, bIdx, bTotal) {
+  document.getElementById('load-txt').textContent = `✨ Generating questions… (${bIdx} of ${bTotal})`;
+  const raw = await callOpenAI([
+    { role: 'system', content: 'You are a Korean-Hindi vocabulary expert. Output only valid JSON arrays, no markdown.' },
+    { role: 'user', content: `For each Korean word, give:\n1. The correct Hindi meaning in Devanagari\n2. Exactly 7 wrong but plausible Hindi meanings (same topic, tricky!)\n\nReturn ONLY a JSON array:\n[{"word":"사랑","correct":"प्यार","wrong":["दर्द","खुशी","दोस्त","घर","रात","दिल","सपना"]},...]\n\nWords: ${JSON.stringify(words)}` }
+  ]);
+  const clean = raw.replace(/```json|```/g, '').trim();
+  const m = clean.match(/\[[\s\S]*\]/);
+  if (!m) return [];
+  try {
+    return JSON.parse(m[0]).filter(x => x.word && x.correct && Array.isArray(x.wrong) && x.wrong.length >= 7);
+  } catch { return []; }
+}
+
+function shuffle(a) {
+  const b = [...a];
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+
+// ── START QUIZ ──
+async function startQuiz() {
+  if (S.loading) return;
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { setSt('⚠️ Please enter your OpenAI API key first! 🔑', 'err'); return; }
+  const text = document.getElementById('txt').value.trim();
+  if (!text) { setSt('⚠️ Please paste some text first! 📝', 'err'); return; }
+
+  S.loading = true;
+  document.getElementById('go-btn').disabled = true;
+  setSt('');
+
+  // Show loading screen
+  document.getElementById('inp-sec').classList.add('hidden');
+  document.getElementById('api-sec').classList.add('hidden');
+  document.getElementById('load-sec').classList.remove('hidden');
+  startLoadAnim();
+
+  try {
+    const words = await extractKorean(text);
+    S.words = words;
+
+    // Show chips
+    document.getElementById('chips').innerHTML = words.map((w, i) => `<span class="chip" id="ch${i}">${w}</span>`).join('');
+    document.getElementById('wl-sec').classList.remove('hidden');
+
+    const BATCH = 8;
+    let all = [];
+    for (let i = 0; i < words.length; i += BATCH) {
+      const batch = words.slice(i, i + BATCH);
+      const bIdx = Math.floor(i / BATCH) + 1;
+      const bTotal = Math.ceil(words.length / BATCH);
+      const items = await generateBatch(batch, bIdx, bTotal);
+      all = all.concat(items);
+      if (i + BATCH < words.length) await sleep(1000);
+    }
+
+    if (all.length === 0) throw new Error('Could not generate questions 😅 Try again!');
+
+    S.qs = all.map(x => ({ word: x.word, correct: x.correct, options: shuffle([x.correct, ...x.wrong.slice(0, 7)]) }));
+    S.cur = 0; S.score = 0; S.answers = [];
+
+    stopLoadAnim();
+    document.getElementById('load-sec').classList.add('hidden');
+    document.getElementById('quiz-sec').classList.remove('hidden');
+
+    // Copy chips to quiz panel
+    document.getElementById('q-chips').innerHTML = document.getElementById('chips').innerHTML;
+    renderQ();
+
+  } catch (err) {
+    stopLoadAnim();
+    document.getElementById('load-sec').classList.add('hidden');
+    document.getElementById('inp-sec').classList.remove('hidden');
+    document.getElementById('api-sec').classList.remove('hidden');
+    setSt('❌ ' + err.message, 'err');
+    document.getElementById('go-btn').disabled = false;
+  }
+  S.loading = false;
+}
+
+// ── CHIPS ──
+function updateChips() {
+  ['chips','q-chips'].forEach(id => {
+    S.words.forEach((w, i) => {
+      const c = document.getElementById(id === 'chips' ? 'ch'+i : 'qch'+i);
+      if (!c) return;
+      c.className = 'chip';
+      const qi = S.qs.findIndex(q => q.word === w);
+      if (qi < S.cur) c.classList.add('done');
+      else if (qi === S.cur) c.classList.add('cur');
+    });
+  });
+}
+
+// ── RENDER QUESTION ──
+function renderQ() {
+  const q = S.qs[S.cur], tot = S.qs.length;
+  document.getElementById('prog').style.width = (S.cur / tot * 100) + '%';
+  document.getElementById('q-ctr').textContent = '🎯 Question ' + (S.cur + 1) + ' of ' + tot;
+
+  // Stars (max 5)
+  const starCount = Math.min(5, S.score);
+  document.getElementById('q-stars').textContent = '⭐'.repeat(starCount) + (starCount < 5 ? '☆'.repeat(5 - starCount) : '');
+
+  // Word + card color
+  document.getElementById('q-wd').textContent = q.word;
+  const card = document.getElementById('word-card');
+  card.className = 'word-card ' + CARD_COLORS[S.cur % CARD_COLORS.length];
+
+  // Options
+  document.getElementById('opts').innerHTML = q.options.map((o, i) =>
+    `<button class="opt oc${i}" onclick="pick(this,'${o.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+      <span class="opt-l">${LETTERS[i]}</span><span>${o}</span>
+    </button>`
+  ).join('');
+
+  document.getElementById('fb').style.display = 'none';
+  document.getElementById('fb').className = 'fb';
+  document.getElementById('nxt-row').style.display = 'none';
+
+  // Re-render quiz chips with qch prefix
+  document.getElementById('q-chips').innerHTML = S.words.map((w, i) => `<span class="chip" id="qch${i}">${w}</span>`).join('');
+  updateChips();
+}
+
+// ── PICK ANSWER ──
+function pick(btn, chosen) {
+  const q = S.qs[S.cur];
+  const isOk = chosen === q.correct;
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    const lbl = b.querySelector('span:last-child').textContent;
+    if (lbl === q.correct) b.classList.add('ok');
+    else if (lbl === chosen && !isOk) b.classList.add('bad');
+    else b.classList.add('dim');
+  });
+  if (isOk) S.score++;
+  const fb = document.getElementById('fb');
+  fb.style.display = 'block';
+  fb.className = 'fb ' + (isOk ? 'ok' : 'bad');
+  fb.textContent = isOk
+    ? `🎉 शाबाश! That's right! "${q.correct}" is the Hindi meaning of ${q.word}!`
+    : `😅 Oops! The correct answer was "${q.correct}" for ${q.word}.`;
+  S.answers.push({ word: q.word, correct: q.correct, chosen, isOk });
+
+  // Update stars
+  const starCount = Math.min(5, S.score);
+  document.getElementById('q-stars').textContent = '⭐'.repeat(starCount) + (starCount < 5 ? '☆'.repeat(5 - starCount) : '');
+
+  const nr = document.getElementById('nxt-row');
+  nr.style.display = 'flex';
+  if (S.cur === S.qs.length - 1) {
+    nr.innerHTML = '<button class="btn btn-main" style="width:auto;margin-top:0" onclick="showRes()">See Results 🎉</button>';
+  }
+}
+
+function nextQ() {
+  S.cur++;
+  if (S.cur >= S.qs.length) showRes(); else renderQ();
+}
+
+// ── RESULTS ──
+function showRes() {
+  document.getElementById('quiz-sec').classList.add('hidden');
+  document.getElementById('wl-sec').classList.add('hidden');
+  document.getElementById('res-sec').classList.remove('hidden');
+
+  const ok = S.answers.filter(a => a.isOk).length;
+  const tot = S.answers.length;
+  const pct = Math.round(ok / tot * 100);
+
+  document.getElementById('r-pct').textContent = pct + '%';
+  document.getElementById('r-ok').textContent = ok;
+  document.getElementById('r-bad').textContent = tot - ok;
+  document.getElementById('r-tot').textContent = tot;
+
+  let emo = '💪', msg = "Keep going — you'll get there! 🔥";
+  if (pct >= 90) { emo = '🏆'; msg = "You're a Korean star! ⭐ Incredible!"; }
+  else if (pct >= 70) { emo = '🎉'; msg = "Great job! You really know your Korean! 🇰🇷"; }
+  else if (pct >= 50) { emo = '👍'; msg = "Not bad! A bit more practice and you'll ace it! 💪"; }
+
+  document.getElementById('r-emo').textContent = emo;
+  document.getElementById('r-msg').textContent = msg;
+
+  document.getElementById('rev-body').innerHTML = S.answers.map(a =>
+    `<tr>
+      <td>${a.word}</td>
+      <td>${a.correct}</td>
+      <td style="color:${a.isOk ? '#065F46' : '#991B1B'}">${a.chosen}</td>
+      <td><span class="badge ${a.isOk ? 'ok' : 'bad'}">${a.isOk ? '✅' : '❌'}</span></td>
+    </tr>`
+  ).join('');
+}
+
+// ── RESET ──
+function resetAll() {
+  S = { qs:[], cur:0, score:0, answers:[], words:[], loading:false };
+  document.getElementById('txt').value = '';
+  document.getElementById('fnm').textContent = '';
+  document.getElementById('status').textContent = '';
+  document.getElementById('status').className = '';
+  document.getElementById('go-btn').disabled = false;
+  document.getElementById('prog').style.width = '0%';
+  ['inp-sec','api-sec'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+  ['wl-sec','quiz-sec','res-sec','load-sec'].forEach(id => document.getElementById(id).classList.add('hidden'));
+}
+</script>
+</body>
+</html>
